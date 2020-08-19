@@ -1,0 +1,8 @@
+[package]
+name = "retinaface-pytorch-resnet50"
+version = "0.1.0"
+authors = ["s3nh"]
+
+[dependencies]
+image = "*"
+tract-onnx = { path = "tract/onnx"}
