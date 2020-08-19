@@ -1,4 +1,6 @@
 use tract_onnx::prelude::*;
+use image::*;
+use image::imageops::*;
 
 
 // read facedetector.onnx and check if it does not fuck up with  
@@ -20,6 +22,6 @@ fn main() -> TractResult<()> {
     })
     .into();
 
-    let result = mode.run(tvec!(image))?;
-    println!(result);
+    let result = model.run(tvec!(image))?;
+    println!("{}", result);
 }
