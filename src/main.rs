@@ -1,18 +1,16 @@
+use tract_ndarray::Array;
 use tract_onnx::prelude::*;
-use image::*;
-use image::imageops::*;
-
 
 // read facedetector.onnx and check if it does not fuck up with  
 // onnx version
 
 fn main() -> TractResult<()> {
     let model = tract_onnx::onnx()
-        .model_path("../model/FaceDetector.onnx")?
-        .with_input_fact(0, InferenceFact::dt_shape(f32::datum_type(), tvec!(1, 3, 224, 224)))?
-        .into_optimized()?
-        .into_runnable()?;
-    Ok(());
+        .model_for_path("../model/FaceDetector.onnx")?;
+
+        model.set_input_fact(0, InferenceFact::dt_shape(f32::datum_type(), tvec!(1, 3, 224, 224)))?;
+        let model = model.into_optimized()?;
+
     // open image and check if is it worth something 
     
     let image = image::open("test.jpg").unwrap().to_rgb();

@@ -2,7 +2,8 @@
 name = "retinaface-pytorch-resnet50"
 version = "0.1.0"
 authors = ["s3nh"]
+edition = "2018"
 
 [dependencies]
 image = "*"
-tract-onnx = { path = "tract/onnx"}
+tract-onnx = "0.10.5"
