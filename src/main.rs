@@ -4,7 +4,7 @@ use tract_onnx::prelude::*;
 // read facedetector.onnx and check if it does not fuck up with  
 // onnx version
 
-fn main() -> Result<()>{
+fn main() -> Result<(), ()>{
     let mut  model = tract_onnx::onnx()
         .model_for_path("../model/FaceDetector.onnx")?;
     /*
