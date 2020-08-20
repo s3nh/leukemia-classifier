@@ -1048,6 +1048,7 @@ name = "retinaface-pytorch-resnet50"
 version = "0.1.0"
 dependencies = [
  "image",
+ "ndarray",
  "tract-onnx",
 ]
 

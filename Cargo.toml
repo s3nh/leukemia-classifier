@@ -7,3 +7,4 @@ edition = "2018"
 [dependencies]
 image = "*"
 tract-onnx = "0.10.5"
+ndarray = "*"
