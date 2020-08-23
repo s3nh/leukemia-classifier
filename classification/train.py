@@ -122,8 +122,8 @@ class ClassificationTask(pl.LightningModul):
         return [optimizer], [scheduler]
 
 
-
-
+    # Assuming well prepared dataset
+    # like imagefolder 
 
 
 

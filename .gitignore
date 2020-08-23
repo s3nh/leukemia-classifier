@@ -2,3 +2,5 @@
 /target/
 *.jpg
 /model/
+**/target/*
+**/target/debug/*

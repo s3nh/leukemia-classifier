@@ -1,0 +1,11 @@
+[package] 
+name = "file_transfer"
+version = "0.1.0" 
+authors = ["s3nh"]
+edition = "2018"
+
+
+[dependencies]
+actix-web = "1"
+futures = "0.1"
+rand = "0.6"
