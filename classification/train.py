@@ -9,13 +9,9 @@ import torch.nn.functional as F
 from torch import optim 
 from torch.nn import Module 
 
-# Optim section 
-
 from torch.optim.lr_scheduler import MultiStepLR 
 from torch.optim.optimizer import Optimizer 
 from torch.utils.data import DataLoader
-
-# Torchvision 
 
 from torchvision import models 
 from torchvision import transforms 
@@ -26,47 +22,33 @@ from pytorch_lightning import _logger as log
 from utils import make_traineble, freeze
 from utils import predefined_transform
 
-"""
-Define an classification module 
-for pretrained structures, based on 
-configuration files
-"""
+import yaml
 
-class ClassificationTask(pl.LightningModul):
+class ClassificationTask(pl.LightningModule):
     def __init__(self,
-                 backbone: str = 'resnet50',
-                 train_bn: bool = True,
-                 batchsize: int = 8,
-                 lr: float = 1e-4,
-                 lr_scheduler_gamma: float = 1e-1,
-                 num_workers: int  = -1,
-                 n_classes : int  = 10,
                  transform = predefined_transform(),
                  config_path : str = 'config/config.yaml',
-                 #TODO Kwargs are not necessary imo
                  **kwargs) -> None:
         super().__init__()
-        self.backbone = backbone;
-        self.train_bn = train_bn;
-        self.lr = lr;
-        self.lr_scheduler_gamma = lr_scheduler_gamma;
-        self.num_workers = num_workers;
         self.config = self.read_config(path=config_path)
-        #Change naming, transform seems to be very error creating
+        self.backbone = config.get('backbone');
+        self.train_bn = config.get('train_bn');
+        self.lr = config.get('lr');
+        self.lr_scheduler_gamma = config.get('lr_scheduler_gamma');
+        self.num_workers = config.get('num_workers');
         self.transform = transform
         self.__build_model()
 
     def __build_model(self):
-        # Sneaky
         model_func = getattr(models, self.backbone);
         backbone = model_func(pretrained=True)
         _layers = list(backbone.children())[:-1]
         self.feature_extractor = torch.nn.Sequential(*_layers)
         freeze(module = self.feature_extractor, train_bn = self.train_bn)
 
-        _fc_layers = [torch.nn.Linear(2048, 256),
-                      torch.nn.Linear(256, 32),
-                      torch.nn.Linear(32, self.n_classes)]
+        _fc_layers = [torch.nn.Linear(self.config.get('FC1'), self.config.get('FC2')),
+                      torch.nn.Linear(self.config.get('FC2'), self.config.get('FC3')),
+                      torch.nn.Linear(self.config.get('FC3'), self.n_classes)]
 
         self.fc = torch.nn.Sequential(*_fc_layers)
         self.loss_func = nn.CrossEntropyLoss
@@ -106,26 +88,15 @@ class ClassificationTask(pl.LightningModul):
                               'num_correct' : num_correct,
                               'log' : tqdm_dict,
                               'progress_bar' : tqdm_dict})
-
         return output
 
-# Add valid steps
     def configure_optimizers(self):
         optimizer = optim.Adam(filter(lambda p : p.requires_grad,
                                       self.parameters()),
                                      lr = self.lr)
-
         scheduler = MultiStepLR(optimizer,
                                 gamma = self.lr_scheduler_gamma)
-
         return [optimizer], [scheduler]
-
-    """
-    def transform(self):
-        return predefined_transform()
-    """
-    # Assuming well prepared dataset
-    # like imagefolder 
 
     def setup(self, stage: str):
         data_path = Path(self.dl_path)
@@ -140,12 +111,10 @@ class ClassificationTask(pl.LightningModul):
         self.valid_dataset = valid_dataset
 
     def __dataloader(self, train : bool) -> None:
-
         dataset = self.train_dataset if train else self.valid_dataset;
         dataloader = DataLoader(dataset = dataset,
                                 batch_size = self.batch_size,
                                 shuffle = True if train else False)
-
         return dataloader
 
     def train_dataloader(self):
@@ -168,19 +137,15 @@ class ClassificationTask(pl.LightningModul):
         :return:
         """
         pass
-
-    
-    
-    
  
     def main() -> None:
-
         """
         Model training process
         """
-        # add args here
+        with open('config/config.yaml', 'r') as confile:
+            config = yaml.safe_load(confile)
+
         model = ClassificationTask() 
-        
         trainer = pl.Trainer(
                 weights_summary = None, 
                 progress_bar_refresh_rate = 1, 
