@@ -39,7 +39,6 @@ def _recursive_freeze(module : Module,
 
 def freeze(module : Module, n: Optional[int] =  None, train_bn: bool = True) -> None:
     """
-
     :param module:  Module to freeze
     :param n:  max freeze depth
     :param train_bn:  if True, train on bn
