@@ -154,6 +154,7 @@ class ClassificationTask(pl.LightningModul):
     def val_dataloader(self):
         return self.__dataloader(train=False);
 
+    @staticmethod 
     def read_config(self, path : str) -> Dict:
         with open(config_path, 'r') as confile:
             config = yaml.safe_load(confile)
@@ -168,6 +169,24 @@ class ClassificationTask(pl.LightningModul):
         """
         pass
 
+    
+    
+    
+ 
+    def main() -> None:
 
+        """
+        Model training process
+        """
+        # add args here
+        model = ClassificationTask() 
+        
+        trainer = pl.Trainer(
+                weights_summary = None, 
+                progress_bar_refresh_rate = 1, 
+                num_sanity_val_steps = 0, 
+                gpu = config.gpus, 
+                min_epochs = config.nb_epochs, 
+                max_epochs = config.nv_epochs)
 
-
+        trainer.fit(model)  
