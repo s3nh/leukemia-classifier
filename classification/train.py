@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Optional, Generator, Union, Dict
 
 import torch 
+import torch.nn as nn
 import torch.nn.functional as F
 from torch import optim 
 from torch.nn import Module 
@@ -36,6 +37,7 @@ class ClassificationTask(pl.LightningModule):
         self.lr = self.config.get('lr');
         self.lr_scheduler_gamma = self.config.get('lr_scheduler_gamma');
         self.num_workers = self.config.get('num_workers');
+        self.n_classes = self.config.get('n_classes');
         self.transform = transform
         self.__build_model()
 
@@ -150,7 +152,7 @@ def main() -> None:
             progress_bar_refresh_rate = 1, 
             #Check in docs
             num_sanity_val_steps = 0, 
-            gpu = config.get('gpus'), 
+            gpus = config.get('gpus'), 
             min_epochs = config.get('nb_epochs'), 
             max_epochs = config.get('nb_epochs'))
 

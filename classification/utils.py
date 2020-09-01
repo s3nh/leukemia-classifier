@@ -7,6 +7,7 @@ from torch.nn import Module
 import typing 
 from typing import Optional, Dict, List, Union
 
+BN_TYPES = (torch.nn.BatchNorm1d, torch.nn.BatchNorm2d, torch.nn.BatchNorm3d)
 
 def _make_trainable(module: Module) -> None:
     """ Unfreezes a given module
@@ -55,7 +56,7 @@ def freeze(module : Module, n: Optional[int] =  None, train_bn: bool = True) -> 
     for child in children[:n_max]:
         _recursive_freeze(module = child, train_bn = train_bn)
 
-    for child in children[nmax:]:
+    for child in children[n_max:]:
         _make_trainable(module=child)
 
 
