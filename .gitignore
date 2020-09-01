@@ -1,6 +1,8 @@
+**/lightning_logs/
 /data/
 /target/
 *.jpg
 /model/
 **/target/*
 **/target/debug/*
+

@@ -33,6 +33,7 @@ class ClassificationTask(pl.LightningModule):
                  **kwargs) -> None:
         super().__init__()
         self.config = self.read_config(path=config_path)
+        self.batch_size = self.config.get('batch_size');
         self.backbone = self.config.get('backbone');
         self.train_bn = self.config.get('train_bn');
         self.lr = self.config.get('lr');
