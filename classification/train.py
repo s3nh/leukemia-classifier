@@ -1,8 +1,8 @@
 import albumentations as A
 import argparse
-from collection import OrderedDict 
+from collections import OrderedDict 
 from pathlib import Path 
-from typing import Optional, Generator, Union
+from typing import Optional, Generator, Union, Dict
 
 import torch 
 import torch.nn.functional as F
@@ -19,7 +19,7 @@ from torchvision import transforms
 import pytorch_lightning as pl
 from pytorch_lightning import _logger as log 
 
-from utils import make_traineble, freeze
+from utils import _make_trainable, freeze
 from utils import predefined_transform
 
 import yaml
@@ -31,11 +31,11 @@ class ClassificationTask(pl.LightningModule):
                  **kwargs) -> None:
         super().__init__()
         self.config = self.read_config(path=config_path)
-        self.backbone = config.get('backbone');
-        self.train_bn = config.get('train_bn');
-        self.lr = config.get('lr');
-        self.lr_scheduler_gamma = config.get('lr_scheduler_gamma');
-        self.num_workers = config.get('num_workers');
+        self.backbone = self.config.get('backbone');
+        self.train_bn = self.config.get('train_bn');
+        self.lr = self.config.get('lr');
+        self.lr_scheduler_gamma = self.config.get('lr_scheduler_gamma');
+        self.num_workers = self.config.get('num_workers');
         self.transform = transform
         self.__build_model()
 
@@ -123,9 +123,8 @@ class ClassificationTask(pl.LightningModule):
     def val_dataloader(self):
         return self.__dataloader(train=False);
 
-    @staticmethod 
     def read_config(self, path : str) -> Dict:
-        with open(config_path, 'r') as confile:
+        with open(path, 'r') as confile:
             config = yaml.safe_load(confile)
         return config
 
@@ -137,21 +136,26 @@ class ClassificationTask(pl.LightningModule):
         :return:
         """
         pass
- 
-    def main() -> None:
-        """
-        Model training process
-        """
-        with open('config/config.yaml', 'r') as confile:
-            config = yaml.safe_load(confile)
 
-        model = ClassificationTask() 
-        trainer = pl.Trainer(
-                weights_summary = None, 
-                progress_bar_refresh_rate = 1, 
-                num_sanity_val_steps = 0, 
-                gpu = config.gpus, 
-                min_epochs = config.nb_epochs, 
-                max_epochs = config.nv_epochs)
+def main() -> None:
+    """
+    Model training process
+    """
+    with open('config/config.yaml', 'r') as confile:
+        config = yaml.safe_load(confile)
 
-        trainer.fit(model)  
+    model = ClassificationTask() 
+    trainer = pl.Trainer(
+            weights_summary = None, 
+            progress_bar_refresh_rate = 1, 
+            #Check in docs
+            num_sanity_val_steps = 0, 
+            gpu = config.get('gpus'), 
+            min_epochs = config.get('nb_epochs'), 
+            max_epochs = config.get('nb_epochs'))
+
+    trainer.fit(model)  
+
+
+if __name__ == "__main__":
+    main()
