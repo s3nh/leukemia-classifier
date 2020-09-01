@@ -1,0 +1,11 @@
+/data/
+*.tar.gz
+/venv/
+wandb/
+dataset-medium/*
+*.ipynb
+/lightning_logs/*
+__pycache__/
+/results/
+*results*/
+/images/
