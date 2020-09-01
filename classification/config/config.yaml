@@ -2,11 +2,14 @@ nb_epochs: 10
 gpus: 1
 backbone: 'resnet50'
 train_bn: True
+train: '../data/training'
+validation: '../data/validation'
 batchsize: 8
-lr: 1e-4
-lr_scheduler_gamma: 1e-1
+lr: 0.0001 
+lr_scheduler_gamma: 0.01 
 num_workers: -1
 n_classes: 10
 FC1: 2048
 FC2: 256
 FC3: 32
+milestones: [3, 5, 7]

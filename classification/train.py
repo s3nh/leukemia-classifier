@@ -16,6 +16,7 @@ from torch.utils.data import DataLoader
 
 from torchvision import models 
 from torchvision import transforms 
+from torchvision.datasets import ImageFolder
 
 import pytorch_lightning as pl
 from pytorch_lightning import _logger as log 
@@ -97,16 +98,16 @@ class ClassificationTask(pl.LightningModule):
                                       self.parameters()),
                                      lr = self.lr)
         scheduler = MultiStepLR(optimizer,
+                                milestones = self.config.get('milestones'), 
                                 gamma = self.lr_scheduler_gamma)
         return [optimizer], [scheduler]
 
     def setup(self, stage: str):
-        data_path = Path(self.dl_path)
-        train_dataset = ImageFolder(root = data_path.join('train'),
+        train_dataset = ImageFolder(root = self.config.get('train'),
                                    transform = self.transform
                                    )
 
-        valid_dataset = ImageFolder(root = data_path.join('validation'),
+        valid_dataset = ImageFolder(root = self.config.get('validation'),
                                     transform = self.transform
                                     )
         self.train_dataset = train_dataset
