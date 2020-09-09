@@ -2,8 +2,8 @@ nb_epochs: 10
 gpus: 1
 backbone: 'resnet50'
 train_bn: True
-train: '../data/training'
-validation: '../data/validation'
+train: '../../data/C-NMC_Leukemia/training_data/fold_0'
+validation: '../../data/C-NMC_Leukemia/validation_data/fold_0'
 batch_size: 8
 lr: 0.0001 
 lr_scheduler_gamma: 0.01 

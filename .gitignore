@@ -5,4 +5,5 @@
 /model/
 **/target/*
 **/target/debug/*
-
+*.pyc
+venv/

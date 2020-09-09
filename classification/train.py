@@ -57,6 +57,17 @@ class ClassificationTask(pl.LightningModule):
         self.fc = torch.nn.Sequential(*_fc_layers)
         self.loss_func = nn.CrossEntropyLoss
 
+    def setup(self, stage: str):
+        train_dataset = ImageFolder(root = self.config.get('train'),
+                                transform = self.transform
+                                )
+
+        valid_dataset = ImageFolder(root = self.config.get('validation'),
+                                transform = self.transform
+                                )
+        self.train_dataset = train_dataset
+        self.valid_dataset = valid_dataset
+        
     def forward(self, x):
         """
         :param x: input data
@@ -94,7 +105,34 @@ class ClassificationTask(pl.LightningModule):
                               'progress_bar' : tqdm_dict})
         return output
 
+    def validation_step(self, batch, batch_idx):
+        """
+        Input processing, loss formating 
+        and forward process could be also involved 
+        in other functions, 
+        to set validation/training parts more readable 
+        
+        """
+        x, y = batch
+        val_logits = self.forward(x)
+        val_pred = torch.argmax(nn.Softmax(y_logits)) 
+        val_true = y.view((-1, 1)).type_as(x)
+        
+        val_loss = self.loss(val_logits, val_true)  
+        num_val_correct = torch.eq(val_pred.view(-1), val_true(-1)).sum() 
+        tqdm_dict = {'val_loss' : val_loss}
+        output = OrderedDict({'val_loss' : val_loss, 
+                              'num_correct' : num_val_correct, 
+                               'log' : tqdm_dict, 
+                               'progress_bar' : tqdm_dict }) 
+
+        return output
+        
     def configure_optimizers(self):
+        """
+        #TODO 
+        What if we want to change optimizers? 
+        """
         optimizer = optim.Adam(filter(lambda p : p.requires_grad,
                                       self.parameters()),
                                      lr = self.lr)
@@ -103,19 +141,11 @@ class ClassificationTask(pl.LightningModule):
                                 gamma = self.lr_scheduler_gamma)
         return [optimizer], [scheduler]
 
-    def setup(self, stage: str):
-        train_dataset = ImageFolder(root = self.config.get('train'),
-                                   transform = self.transform
-                                   )
-
-        valid_dataset = ImageFolder(root = self.config.get('validation'),
-                                    transform = self.transform
-                                    )
-        self.train_dataset = train_dataset
-        self.valid_dataset = valid_dataset
+    """
+    Comment, as long as data.py is not tested  
 
     def __dataloader(self, train : bool) -> None:
-        dataset = self.train_dataset if train else self.valid_dataset;
+        dataset = self.train_dataset if train else self.valid_dataset
         dataloader = DataLoader(dataset = dataset,
                                 batch_size = self.batch_size,
                                 shuffle = True if train else False)
@@ -126,7 +156,8 @@ class ClassificationTask(pl.LightningModule):
 
     def val_dataloader(self):
         return self.__dataloader(train=False);
-
+    """
+    
     def read_config(self, path : str) -> Dict:
         with open(path, 'r') as confile:
             config = yaml.safe_load(confile)
@@ -152,14 +183,12 @@ def main() -> None:
     trainer = pl.Trainer(
             weights_summary = None, 
             progress_bar_refresh_rate = 1, 
-            #Check in docs
             num_sanity_val_steps = 0, 
             gpus = config.get('gpus'), 
             min_epochs = config.get('nb_epochs'), 
             max_epochs = config.get('nb_epochs'))
 
     trainer.fit(model)  
-
 
 if __name__ == "__main__":
     main()
