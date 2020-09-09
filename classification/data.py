@@ -15,7 +15,7 @@ class ClassificationTaskDataModule(pl.LightningDataModule):
         self.config = self.read_config(path = config_path)    
         self.transform = predefined_transform()
         self.batch_size = self.config.get('batch_size')
-        #self._has_prepared_data = False
+
     def read_config(self, path : str) -> Dict:
         with open(path, 'r') as confile:
             config = yaml.safe_load(confile)
@@ -26,7 +26,6 @@ class ClassificationTaskDataModule(pl.LightningDataModule):
                                      )
          valid_dataset = ImageFolder(root = self.config.get('validation'), 
                                      )
-         
 
     def setup(self, stage: str):
         train_dataset = ImageFolder(root = self.config.get('train'),
@@ -43,7 +42,8 @@ class ClassificationTaskDataModule(pl.LightningDataModule):
         dataset = self.train_dataset if train else self.valid_dataset
         dataloader = DataLoader(dataset = dataset,
                                 batch_size = self.batch_size,
-                                shuffle = True if train else False)
+                                shuffle = True if train else False, 
+                                num_workers= 4)
         return dataloader
 
     def train_dataloader(self):

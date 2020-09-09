@@ -1,4 +1,5 @@
 import albumentations as A
+import os 
 import torch 
 import torch.nn as nn 
 import torch.nn.functional as F
@@ -6,6 +7,7 @@ import torch.nn.functional as F
 from torch.nn import Module 
 import typing 
 from typing import Optional, Dict, List, Union
+from pytorch_lightning.callbacks import ModelCheckpoint
 
 BN_TYPES = (torch.nn.BatchNorm1d, torch.nn.BatchNorm2d, torch.nn.BatchNorm3d)
 
@@ -97,3 +99,15 @@ def predefined_transform() -> None:
     ])
 
 
+def customized_callbacks(**kwargs) -> None:
+    path = os.makedirs('models', exist_ok=True) 
+    return ModelCheckpoint(
+        filepath= path, 
+        save_top_k= 1, 
+        verbose = True,
+        monitor = 'val_loss', 
+        mode = 'min', 
+        prefix = 'leukemia_resnet50_'
+    ) 
+
+    

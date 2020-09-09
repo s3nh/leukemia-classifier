@@ -20,6 +20,7 @@ from torchvision.datasets import ImageFolder
 
 import pytorch_lightning as pl
 from pytorch_lightning import _logger as log 
+from pytorch_lightning.callbacks import ModelCheckpoint
 
 from utils import _make_trainable, freeze
 from utils import predefined_transform
@@ -56,7 +57,7 @@ class ClassificationTask(pl.LightningModule):
 
         self.fc = torch.nn.Sequential(*_fc_layers)
         self.loss_func = F.cross_entropy #nn.CrossEntropyLoss
-
+    """
     def setup(self, stage: str):
         train_dataset = ImageFolder(root = self.config.get('train'),
                                 transform = self.transform
@@ -67,6 +68,7 @@ class ClassificationTask(pl.LightningModule):
                                 )
         self.train_dataset = train_dataset
         self.valid_dataset = valid_dataset
+    """
         
     def forward(self, x):
         """
@@ -93,16 +95,12 @@ class ClassificationTask(pl.LightningModule):
         x,y = batch
         y_logits = self.forward(x)
         y_pred = torch.argmax( y_logits)
-        print(y_pred)
-        y_true = y
-        
-
-        train_loss = self.loss(y_logits, y_true)
-        num_correct = torch.eq(y_pred.view(-1), y_true.view(-1)).sum()
-
+        train_loss = self.loss(y_logits, y)
+        #num_correct = torch.eq(y_pred.view(-1), y_true.view(-1)).sum()
         tqdm_dict = {'train_loss' : train_loss}
-        output = OrderedDict({'loss' : train_loss,
-                              'num_correct' : num_correct,
+        output = OrderedDict({
+                              'loss' : train_loss,
+                              #'num_correct' : num_correct,
                               'log' : tqdm_dict,
                               'progress_bar' : tqdm_dict})
         return output
@@ -118,23 +116,14 @@ class ClassificationTask(pl.LightningModule):
         x, y = batch
         val_logits = self.forward(x)
         val_pred = torch.argmax(val_logits) 
-        #val_true = y.view((-1, 1)).type_as(x)
-        val_true = y 
-        val_loss = self.loss(val_logits, val_true)  
-        num_val_correct = torch.eq(val_pred.view(-1), val_true(-1)).sum() 
-        tqdm_dict = {'val_loss' : val_loss}
-        output = OrderedDict({'val_loss' : val_loss, 
-                              'num_correct' : num_val_correct, 
+        va_loss = self.loss(val_logits, y)  
+        tqdm_dict = {'val_loss' : va_loss}
+        output = OrderedDict({'val_loss' : va_loss, 
                                'log' : tqdm_dict, 
                                'progress_bar' : tqdm_dict }) 
-
         return output
         
     def configure_optimizers(self):
-        """
-        #TODO 
-        What if we want to change optimizers? 
-        """
         optimizer = optim.Adam(filter(lambda p : p.requires_grad,
                                       self.parameters()),
                                      lr = self.lr)
@@ -165,6 +154,7 @@ class ClassificationTask(pl.LightningModule):
             config = yaml.safe_load(confile)
         return config
 
+    #TODO -> Remove if its necessary 
     @staticmethod
     def add_model_specific_args(config):
         """
@@ -173,24 +163,3 @@ class ClassificationTask(pl.LightningModule):
         :return:
         """
         pass
-
-def main() -> None:
-    """
-    Model training process
-    """
-    with open('config/config.yaml', 'r') as confile:
-        config = yaml.safe_load(confile)
-
-    model = ClassificationTask() 
-    trainer = pl.Trainer(
-            weights_summary = None, 
-            progress_bar_refresh_rate = 1, 
-            num_sanity_val_steps = 0, 
-            gpus = config.get('gpus'), 
-            min_epochs = config.get('nb_epochs'), 
-            max_epochs = config.get('nb_epochs'))
-
-    trainer.fit(model)  
-
-if __name__ == "__main__":
-    main()

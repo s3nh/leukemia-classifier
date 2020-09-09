@@ -7,3 +7,4 @@
 **/target/debug/*
 *.pyc
 venv/
+models/*
