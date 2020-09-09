@@ -3,12 +3,12 @@ gpus: 1
 backbone: 'resnet50'
 train_bn: True
 train: '../../data/C-NMC_Leukemia/training_data/fold_0'
-validation: '../../data/C-NMC_Leukemia/validation_data/fold_0'
+validation: '../../data/C-NMC_Leukemia/training_data/fold_1'
 batch_size: 8
 lr: 0.0001 
 lr_scheduler_gamma: 0.01 
 num_workers: -1
-n_classes: 10
+n_classes: 2 
 FC1: 2048
 FC2: 256
 FC3: 32

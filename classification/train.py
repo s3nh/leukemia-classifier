@@ -55,7 +55,7 @@ class ClassificationTask(pl.LightningModule):
                       torch.nn.Linear(self.config.get('FC3'), self.n_classes)]
 
         self.fc = torch.nn.Sequential(*_fc_layers)
-        self.loss_func = nn.CrossEntropyLoss
+        self.loss_func = F.cross_entropy #nn.CrossEntropyLoss
 
     def setup(self, stage: str):
         train_dataset = ImageFolder(root = self.config.get('train'),
@@ -84,7 +84,7 @@ class ClassificationTask(pl.LightningModule):
         :param labels:  predefined labels
         :return: loss function value
         """
-        return self.loss_func(input = logits, target = labels)
+        return self.loss_func(logits, labels)
 
     def train(self, mode=True):
         super().train(mode=mode)
@@ -92,8 +92,10 @@ class ClassificationTask(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x,y = batch
         y_logits = self.forward(x)
-        y_pred = torch.argmax( nn.Softmax(y_logits))
-        y_true = y.view((-1, 1)).type_as(x)
+        y_pred = torch.argmax( y_logits)
+        print(y_pred)
+        y_true = y
+        
 
         train_loss = self.loss(y_logits, y_true)
         num_correct = torch.eq(y_pred.view(-1), y_true.view(-1)).sum()
@@ -115,9 +117,9 @@ class ClassificationTask(pl.LightningModule):
         """
         x, y = batch
         val_logits = self.forward(x)
-        val_pred = torch.argmax(nn.Softmax(y_logits)) 
-        val_true = y.view((-1, 1)).type_as(x)
-        
+        val_pred = torch.argmax(val_logits) 
+        #val_true = y.view((-1, 1)).type_as(x)
+        val_true = y 
         val_loss = self.loss(val_logits, val_true)  
         num_val_correct = torch.eq(val_pred.view(-1), val_true(-1)).sum() 
         tqdm_dict = {'val_loss' : val_loss}

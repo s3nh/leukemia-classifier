@@ -20,7 +20,7 @@ def main():
     then set pytorch lightning trainer 
     """
     path = 'config/config.yaml'
-    assert os.path.exists(path), 'Path does not exist!' 
+    #assert os.path.exists(path), 'Path does not exist!' 
     config = read_config()
     
     #Based on config info
@@ -34,7 +34,7 @@ def main():
         num_sanity_val_steps= 0, 
         gpus = config.get('gpus'), 
         min_epochs = config.get('np_epochs'), 
-        max_epochs = config.get('nb_epocs'),
+        max_epochs = config.get('nb_epochs'),
     ) 
     
     trainer.fit(model, data) 
