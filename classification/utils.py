@@ -6,6 +6,7 @@ import torch.nn.functional as F
 
 from torch.nn import Module 
 import typing 
+import yaml 
 from typing import Optional, Dict, List, Union
 from pytorch_lightning.callbacks import ModelCheckpoint
 
@@ -110,4 +111,9 @@ def customized_callbacks(**kwargs) -> None:
         prefix = 'leukemia_resnet50_'
     ) 
 
-    
+
+
+def read_config(path : str = 'config/config.yaml') -> Dict:
+    with open(path, 'r') as confile:
+        config = yaml.safe_load(confile)
+    return config
