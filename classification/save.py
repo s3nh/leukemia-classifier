@@ -10,7 +10,7 @@ def save_pt_model(path: str) -> None:
     path: path to which .pt file will be exported 
     """
     model = load_model()
-    torch.save(model.state_dict, path) 
+    torch.save(model.state_dict(), path) 
     
 def main():
     config = read_config() 
