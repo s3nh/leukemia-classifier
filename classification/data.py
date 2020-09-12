@@ -4,11 +4,8 @@ from typing import Dict
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor
-#TODO Thin about hoq ImageFolder is a very bad choice 
 import yaml
 
-# What I dont like is that config has to be repeated twice in that configuration
-# It is no longer possible to 
 class ClassificationTaskDataModule(pl.LightningDataModule):
     def __init__(self, config_path = 'config/config.yaml'):
         super().__init__()
@@ -25,11 +22,9 @@ class ClassificationTaskDataModule(pl.LightningDataModule):
          train_dataset = ImageFolder(root = self.config.get('train'), 
                                      )
          valid_dataset = ImageFolder(root = self.config.get('validation'), 
-                                     )
 
     def setup(self, stage: str):
         train_dataset = ImageFolder(root = self.config.get('train'),
-                                #Omit data transform
                                 transform = ToTensor() 
                                 )
         valid_dataset = ImageFolder(root = self.config.get('validation'),

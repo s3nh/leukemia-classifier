@@ -55,14 +55,11 @@ def freeze(module : Module, n: Optional[int] =  None, train_bn: bool = True) -> 
     children = list(module.children())
     n_max = len(children) if n is None else n
 
-
     for child in children[:n_max]:
         _recursive_freeze(module = child, train_bn = train_bn)
 
     for child in children[n_max:]:
         _make_trainable(module=child)
-
-
 
 def predefined_transform() -> None:
     """
@@ -110,8 +107,6 @@ def customized_callbacks(**kwargs) -> None:
         mode = 'min', 
         prefix = 'leukemia_resnet50_'
     ) 
-
-
 
 def read_config(path : str = 'config/config.yaml') -> Dict:
     with open(path, 'r') as confile:

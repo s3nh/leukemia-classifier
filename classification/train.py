@@ -7,6 +7,8 @@ from typing import Optional, Generator, Union, Dict
 import torch 
 import torch.nn as nn
 import torch.nn.functional as F
+import yaml
+
 from torch import optim 
 from torch.nn import Module 
 
@@ -24,8 +26,6 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 
 from utils import _make_trainable, freeze
 from utils import predefined_transform
-
-import yaml
 
 class ClassificationTask(pl.LightningModule):
     def __init__(self,
@@ -56,20 +56,8 @@ class ClassificationTask(pl.LightningModule):
                       torch.nn.Linear(self.config.get('FC3'), self.n_classes)]
 
         self.fc = torch.nn.Sequential(*_fc_layers)
-        self.loss_func = F.cross_entropy #nn.CrossEntropyLoss
-    """
-    def setup(self, stage: str):
-        train_dataset = ImageFolder(root = self.config.get('train'),
-                                transform = self.transform
-                                )
-
-        valid_dataset = ImageFolder(root = self.config.get('validation'),
-                                transform = self.transform
-                                )
-        self.train_dataset = train_dataset
-        self.valid_dataset = valid_dataset
-    """
-        
+        self.loss_func = F.cross_entropy 
+   
     def forward(self, x):
         """
         :param x: input data
@@ -111,7 +99,6 @@ class ClassificationTask(pl.LightningModule):
         and forward process could be also involved 
         in other functions, 
         to set validation/training parts more readable 
-        
         """
         x, y = batch
         val_logits = self.forward(x)
@@ -131,35 +118,8 @@ class ClassificationTask(pl.LightningModule):
                                 milestones = self.config.get('milestones'), 
                                 gamma = self.lr_scheduler_gamma)
         return [optimizer], [scheduler]
-
-    """
-    Comment, as long as data.py is not tested  
-
-    def __dataloader(self, train : bool) -> None:
-        dataset = self.train_dataset if train else self.valid_dataset
-        dataloader = DataLoader(dataset = dataset,
-                                batch_size = self.batch_size,
-                                shuffle = True if train else False)
-        return dataloader
-
-    def train_dataloader(self):
-        return self.__dataloader(train=True)
-
-    def val_dataloader(self):
-        return self.__dataloader(train=False);
-    """
-    
+   
     def read_config(self, path : str) -> Dict:
         with open(path, 'r') as confile:
             config = yaml.safe_load(confile)
         return config
-
-    #TODO -> Remove if its necessary 
-    @staticmethod
-    def add_model_specific_args(config):
-        """
-        self.config should make things done
-        :param config:
-        :return:
-        """
-        pass

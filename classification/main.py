@@ -23,17 +23,15 @@ def main():
     model = ClassificationTask(config_path = path)
     callbacks = customized_callbacks()
     trainer = pl.Trainer(
-        #weights_summary = None, 
         progress_bar_refresh_rate=10, 
         num_sanity_val_steps= 0, 
         gpus = config.get('gpus'), 
-        min_epochs = 0, #config.get('np_epochs'), 
+        min_epochs = 0,
         max_epochs = config.get('nb_epochs'),
         checkpoint_callback=  callbacks
     ) 
     
     trainer.fit(model, data) 
-
 
 if __name__ == "__main__":
     main()
