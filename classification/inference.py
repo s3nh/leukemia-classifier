@@ -8,7 +8,6 @@ def load_model(**kwargs) -> None:
            
 def main():
     model =  load_model()
-    print(model)
     
 if __name__ == "__main__":
     main()

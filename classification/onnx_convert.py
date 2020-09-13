@@ -4,7 +4,6 @@ import typing
 from typing import Dict
 from train import ClassificationTask
 from utils import read_config
-#TODO ClassificationTask should be included as param  and getattr to argument
 
 def load_model_pt(path: str) ->None:
     model = ClassificationTask()

@@ -14,7 +14,6 @@ assuming that we are using pretrained structures.
 
 to train the model, just pass 
 
-
 ``` 
 python train.py 
 ``` 
