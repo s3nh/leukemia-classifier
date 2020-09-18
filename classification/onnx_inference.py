@@ -4,19 +4,17 @@ import typing
 
 from typing import Dict
 from utils import read_config
+# Why not utils?
 
-def _session_run(config : Dict, output: None = None) -> None:
+
+def _session_run(config : Dict) -> None:
     ort_session = onnxruntime.InferenceSession(config.get('onnx_path'))
-    if output is None:
-        outputs = ort_session.run(None, {'input': np.random.randn(1, 3, 450, 450).astype(np.float32)})
-    else:
-        raise NotImplemented   
-    print(outputs)
-    
-def main():
-    config = read_config()
-    _session_run(config = config, output = None)
-    
-if __name__ == "__main__":
-    main()
+    return ort_session
+
+def _predict(_sess : None, config: Dict, image: None) -> None:
+    input_name: str = sess.get_inputs()[0].name
+    output_name: str = sess.get_outputs()[0].name
+    proba: np.ndarray = sess.run([output_name], {input_name: image})[0]
+    return proba 
+
     
