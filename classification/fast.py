@@ -7,16 +7,16 @@ from utils import load_image
 
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    config = read_config()
-    sess = _session_run(config = config)
-    
+config = read_config()
+sess = _session_run(config = config)
+print(sess)
+
+
 @app.get('/predict/')    
-def get_predict(image: None):
+async def get_predict():
     contents = await file.read()
-    image = load_image(contents, width =450, height = 450) #Image.open(io.BytesIO(contents)).convert('RGB')
-    pred = _predict(_sess = sess, image= image)
+    image = load_image(contents, width =450, height = 450) 
+    pred = _predict(_sess = sess, config = config, image= image)
     return pred
 
 if __name__ == "__main__":
