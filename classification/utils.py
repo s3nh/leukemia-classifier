@@ -1,6 +1,9 @@
 import albumentations as A
-from PIL import Image
+import cv2
+import io
+import numpy as np 
 import os 
+from PIL import Image
 import torch 
 import torch.nn as nn 
 import torch.nn.functional as F
@@ -10,13 +13,18 @@ import typing
 import yaml 
 from typing import Optional, Dict, List, Union
 from pytorch_lightning.callbacks import ModelCheckpoint
-
 BN_TYPES = (torch.nn.BatchNorm1d, torch.nn.BatchNorm2d, torch.nn.BatchNorm3d)
 
 def load_image(path : str, width: int, height: int) -> None:
-    img = Image.open(path)
-    img = img.resize((width, height), Image.ANTIALIAS)
+    img : np.ndarray = cv2.imread(path)
+    img : np.ndarray = img.reshape(-1, *img.shape[::-1]).astype(np.float32)
     return img 
+
+def load_contents(contents: bytearray, width : int = 450, height : int = 450) -> None:
+    image = Image.open(io.BytesIO(contents)).convert('RGB')  
+    image : np.ndarray =  np.asarray(image).reshape(-1, *image.size[::-1]).astype(np.float32)
+    image = image[None, ...]
+    return image 
 
 def _make_trainable(module: Module) -> None:
     """ Unfreezes a given module

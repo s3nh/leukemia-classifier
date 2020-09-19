@@ -12,9 +12,9 @@ def _session_run(config : Dict) -> None:
     return ort_session
 
 def _predict(_sess : None, config: Dict, image: None) -> None:
-    input_name: str = sess.get_inputs()[0].name
-    output_name: str = sess.get_outputs()[0].name
-    proba: np.ndarray = sess.run([output_name], {input_name: image})[0]
+    input_name: str = _sess.get_inputs()[0].name
+    output_name: str = _sess.get_outputs()[0].name
+    proba: np.ndarray = _sess.run([output_name], {input_name: image})[0]
     return proba 
 
     
